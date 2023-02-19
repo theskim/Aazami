@@ -2,8 +2,13 @@
 //By Dano Wall and Becky Stern for Adafruit Industries
 #include <Adafruit_NeoPixel.h>
 
-#define PIN       2 // Marked D1 on GEMMA
+#define PIN       7 // Marked D1 on GEMMA
 #define NUM_LEDS 15
+
+#define RECORD    6
+#define PLAYE     5
+
+#define INTERRUPT 2
 
 // Parameter 1 = number of pixels in strip
 // Parameter 2 = pin number (most are valid)
@@ -20,37 +25,56 @@ uint32_t B = strip.Color(25, 5, 68); // Change RGB color value here
 uint32_t C = strip.Color(0, 75, 90); // Change RGB color value here
 uint32_t D = strip.Color(100, 120, 0); // Change RGB color value here
 
-
 // Array of pixels in order of animation - 70 in total:
-int sine[] = {
-   0,1,2,3,4,5,6,7,8,9,10,11,12,13,14};
+int sine[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14};
+int greenPart[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+int redPart[] = {11, 12, 13, 14};
 
-int greenPart[] = {0,1,2,3,4,5,6,7,8,9};
-int redPart[] = {11,12,13,14};
+void inta();
+void parrotForgot();
+void parrotRepeat();
 
+void setup(){
+   strip.begin();
+   strip.show();            // Initialize all pixels to 'off'
+   strip.setBrightness(40); // 40/255 brightness (about 15%)
 
+   pinMode(RECORD, OUTPUT);
+   pinMode(PLAYE, OUTPUT);
 
-void setup() {
-  strip.begin();
-  strip.show();            // Initialize all pixels to 'off'
-  strip.setBrightness(40); // 40/255 brightness (about 15%)
+   pinMode(INTERRUPT, INPUT_PULLUP);
+
+   attachInterrupt(digitalPinToInterrupt(INTERRUPT),inta, RISING);  
 }
 
-void loop() {
+void loop(){
+  parrotBlink();
+  delay(100);
+  parrotListen();
+}
+
+void inta(){
+  digitalWrite(RECORD,LOW);
   parrotForgot();
-  //parrotBlink();
+  parrotRepeat();
 }
 
-void parrotListen()
-{
+void parrotListen(){
+  digitalWrite(RECORD,HIGH);
+  delay(20000);
+  digitalWrite(RECORD,LOW);
  
 }
 
+void parrotRepeat(){
+  digitalWrite(PLAYE,HIGH);
+  delay(20000);
+  digitalWrite(PLAYE,LOW);
+}
 
-void parrotBlink()
-{
-   for(int gn = 0; gn <= 9; gn++)
-   {
+
+void parrotBlink(){
+   for(int gn = 0; gn <= 9; gn++){
       strip.setPixelColor(greenPart[gn], 0); // Draw 'head' pixel
    }
 
@@ -63,12 +87,10 @@ void parrotBlink()
    delay(200);
    
 
-   for(int gn = 0; gn <= 9; gn++)
-   {
+   for (int gn = 0; gn <= 9; gn++){
       strip.setPixelColor(greenPart[gn], green); // Draw 'head' pixel
    }
-   for(int rd = 0; rd <= 3; rd++)
-   {
+   for (int rd = 0; rd <= 3; rd++){
       strip.setPixelColor(redPart[rd], red); // Draw 'head' pixel
    }
 
@@ -76,25 +98,22 @@ void parrotBlink()
 
    delay(200);
 
-   for(int gn = 0; gn <= 9; gn++)
-   {
+   for (int gn = 0; gn <= 9; gn++){
       strip.setPixelColor(greenPart[gn], 0); // Draw 'head' pixel
    }
-   for(int rd = 0; rd <= 3; rd++)
-   {
+   for (int rd = 0; rd <= 3; rd++){
       strip.setPixelColor(redPart[rd], 0); // Draw 'head' pixel
    }
 
    strip.show();
-
    delay(200);
 
    
-   for(int gn = 0; gn <= 9; gn++)
-   {
+   for(int gn = 0; gn <= 9; gn++){
       strip.setPixelColor(greenPart[gn], green); // Draw 'head' pixel
    }
-strip.setPixelColor(redPart[0], red); // Draw 'head' pixel
+
+   strip.setPixelColor(redPart[0], red); // Draw 'head' pixel
    strip.setPixelColor(redPart[1], 0); // Draw 'head' pixel  
    strip.setPixelColor(redPart[2], 0); // Draw 'head' pixel
    strip.setPixelColor(redPart[3], red); // Draw 'head' pixel
@@ -102,9 +121,6 @@ strip.setPixelColor(redPart[0], red); // Draw 'head' pixel
 
    delay(200);
 }
-
- 
-
  
 void parrotForgot()
 {
@@ -118,7 +134,6 @@ void parrotForgot()
    strip.setPixelColor(7, B); // Draw 'head' pixel
    strip.setPixelColor(8, B); // Draw 'head' pixel
    strip.setPixelColor(9, B); // Draw 'head' pixel
-  // strip.setPixelColor(10, B); // Draw 'head' pixel
    strip.setPixelColor(11, C); // Draw 'head' pixel
    strip.setPixelColor(12, C); // Draw 'head' pixel
    strip.setPixelColor(13, C); // Draw 'head' pixel
@@ -127,7 +142,7 @@ void parrotForgot()
    strip.show();
    delay(200);
 
-    strip.setPixelColor(0, 0); // Draw 'head' pixel
+   strip.setPixelColor(0, 0); // Draw 'head' pixel
    strip.setPixelColor(1, 0); // Draw 'head' pixel
    strip.setPixelColor(2, 0); // Draw 'head' pixel
    strip.setPixelColor(3, 0); // Draw 'head' pixel
@@ -142,8 +157,6 @@ void parrotForgot()
    strip.setPixelColor(12,0); // Draw 'head' pixel
    strip.setPixelColor(13, 0); // Draw 'head' pixel
    strip.setPixelColor(14, 0); // Draw 'head' pixel
-   
-
    strip.show();
 
    delay(200);
